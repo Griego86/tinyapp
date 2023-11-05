@@ -92,3 +92,9 @@ app.post("/urls/:id", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+
+app.post("/login", (req, res) => {
+  const { username } = req.body;
+  res.cookie('username', username); // Set the cookie with the username
+  res.redirect('/urls'); // Redirect the browser back to the /urls page
+});
