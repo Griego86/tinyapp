@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Griego86/tinyapp/issues"
   },
-  "homepage": "https://github.com/Griego86/tinyapp#readme"
+  "homepage": "https://github.com/Griego86/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
