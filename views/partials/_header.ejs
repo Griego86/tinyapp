@@ -14,10 +14,8 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <% if (username) { %>
-          <p class="nav-item text-light mt-2 mr-2">Welcome, <%= username %>!</p>
+        <% if (user) { %>
+          <p class="nav-item text-light mt-2 mr-2">Welcome, <%= user.email %>!</p>
           <form method="POST" action="/logout" class="form-inline my-2 my-lg-0">
             <button type="submit" class="btn btn-outline-light my-2 my-sm-0">Logout</button>
           </form>

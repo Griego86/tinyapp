@@ -12,6 +12,40 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+// Functions to interact with the 'users' object
+function addUser(email, password) {
+  const id = generateRandomString();
+  const newUser = {
+    id,
+    email,
+    password
+  };
+  users[id] = newUser;
+  return id;
+}
+
+function findUserByEmail(email) {
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+    }
+  }
+  return null;
+}
+
 function generateRandomString() {
   const alphanumeric = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let randomString = '';
@@ -20,6 +54,11 @@ function generateRandomString() {
     randomString += alphanumeric[randomIndex];
   }
   return randomString;
+}
+
+// Function to find a user by ID
+function findUserById(userId) {
+  return users[userId];
 }
 
 // Routes
@@ -32,31 +71,51 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  const user = findUserById(req.cookies.user_id);
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies.username // Pass the username to the template
+    user: user // Pass the entire user object to the template
   };
   res.render("urls_index", templateVars);
 });
 
+// Modify the /urls/new endpoint to pass the user object
 app.get("/urls/new", (req, res) => {
+  const user = findUserById(req.cookies.user_id);
   const templateVars = {
-    username: req.cookies.username // Pass the username to the template
+    user: user // Pass the entire user object to the template
   };
   res.render("urls_new", templateVars);
 });
 
-// Other routes...
-
 app.post("/login", (req, res) => {
-  const { username } = req.body;
-  res.cookie('username', username); // Set the cookie with the username
-  res.redirect('/urls'); // Redirect the browser back to the /urls page
+  const { email, password } = req.body;
+  const user = findUserByEmail(email);
+
+  if (user && user.password === password) {
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
+  } else {
+    res.status(403).send("Invalid email or password");
+  }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username'); // Clear the username cookie
-  res.redirect('/urls'); // Redirect the browser back to the /urls page
+  res.clearCookie('user_id');
+  res.redirect('/urls');
+});
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  const user = findUserByEmail(email);
+
+  if (user) {
+    res.status(400).send("Email already exists");
+  } else {
+    const userId = addUser(email, password);
+    res.cookie('user_id', userId);
+    res.redirect('/urls');
+  }
 });
 
 // Start the server
