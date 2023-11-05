@@ -70,6 +70,11 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+// GET route to display the login form
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 app.get("/urls", (req, res) => {
   const user = findUserById(req.cookies.user_id);
   const templateVars = {
@@ -126,6 +131,17 @@ app.post("/register", (req, res) => {
     res.cookie('user_id', userId);
     res.redirect('/urls');
   }
+});
+
+// POST route to remove a URL resource
+app.post("/urls/:id/delete", (req, res) => {
+  const urlId = req.params.id;
+
+  // Use the delete operator to remove the URL from the urlDatabase
+  delete urlDatabase[urlId];
+
+  // Redirect the client back to the urls_index page
+  res.redirect('/urls');
 });
 
 // Start the server

@@ -20,10 +20,8 @@
             <button type="submit" class="btn btn-outline-light my-2 my-sm-0">Logout</button>
           </form>
         <% } else { %>
-          <form method="POST" action="/login" class="form-inline my-2 my-lg-0">
-            <input type="text" name="username" class="form-control mr-sm-2" placeholder="Username">
-            <button type="submit" class="btn btn-outline-light my-2 my-sm-0">Login</button>
-          </form>
+          <a class="nav-item nav-link" href="/register">Register</a>
+          <a class="nav-item nav-link" href="/login">Login</a>
         <% } %>
       </div>
     </div>
