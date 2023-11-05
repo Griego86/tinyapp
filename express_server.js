@@ -105,12 +105,22 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
 });
 
+// POST endpoint for user registration
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
+
+  // Check for empty email or password
+  if (!email || !password) {
+    res.status(400).send("Email and password cannot be empty");
+    return;
+  }
+
   const user = findUserByEmail(email);
 
+  // Check for an existing email in the users object
   if (user) {
     res.status(400).send("Email already exists");
+    return;
   } else {
     const userId = addUser(email, password);
     res.cookie('user_id', userId);
