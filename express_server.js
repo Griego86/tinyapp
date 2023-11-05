@@ -80,3 +80,15 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send("Short URL not found");
   }
 });
+
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const newURL = req.body.newLongURL; // Assuming the form field name is "newLongURL"
+
+  if (urlDatabase[id]) {
+    urlDatabase[id] = newURL; // Update the stored long URL with the new value
+    res.redirect("/urls"); // Redirect back to the urls_index page
+  } else {
+    res.status(404).send("URL not found");
+  }
+});
