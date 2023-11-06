@@ -66,13 +66,24 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// GET route to display the registration form
 app.get("/register", (req, res) => {
-  res.render("register");
+  const user = findUserById(req.cookies.user_id);
+  if (user) {
+    res.redirect('/urls'); // Redirect to /urls if the user is logged in
+  } else {
+    res.render("register");
+  }
 });
 
 // GET route to display the login form
 app.get("/login", (req, res) => {
-  res.render("login");
+  const user = findUserById(req.cookies.user_id);
+  if (user) {
+    res.redirect('/urls'); // Redirect to /urls if the user is logged in
+  } else {
+    res.render("login");
+  }
 });
 
 app.get("/urls", (req, res) => {
@@ -84,14 +95,33 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// Modify the /urls/new endpoint to pass the user object
+// Modify the /urls/new endpoint to allow only logged-in users
 app.get("/urls/new", (req, res) => {
   const user = findUserById(req.cookies.user_id);
-  const templateVars = {
-    user: user // Pass the entire user object to the template
-  };
-  res.render("urls_new", templateVars);
+  if (user) {
+    const templateVars = {
+      user: user
+    };
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect('/login');
+  }
 });
+
+// GET route to redirect short URLs to their long forms
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+
+  // Check if the id exists in the database
+  if (longURL) {
+    res.redirect(longURL); // If the id exists, redirect to the associated long URL
+  } else {
+    res.status(404).send("<h3>URL Not Found</h3><p>The shortened URL you are trying to access does not exist.</p>");
+    // Or render an error page if you have an HTML error file
+    // res.render("error", { message: "URL Not Found" });
+  }
+});
+
 
 
 app.post("/login", (req, res) => {
@@ -148,6 +178,23 @@ app.post("/urls/:id/delete", (req, res) => {
 
   // Redirect the client back to the urls_index page
   res.redirect('/urls');
+});
+
+// POST endpoint to create a new URL, restricted to logged-in users
+app.post("/urls", (req, res) => {
+  const user = findUserById(req.cookies.user_id);
+
+  // Check if user is not logged in
+  if (!user) {
+    res.status(401).send("You must be logged in to create a new URL.");
+  } else {
+    const { longURL } = req.body;
+    const shortURL = generateRandomString();
+
+    // Add the URL to the database only for authenticated users
+    urlDatabase[shortURL] = longURL;
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 
 // Start the server
