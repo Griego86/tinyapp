@@ -93,22 +93,28 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = findUserByEmail(email);
 
-  if (user && user.password === password) {
+  if (!email || !password) {
+    res.status(400).send("Email and password cannot be empty");
+  } else if (!user || user.password !== password) {
+    res.status(403).send("Invalid email or password");
+  } else {
     res.cookie('user_id', user.id);
     res.redirect('/urls');
-  } else {
-    res.status(403).send("Invalid email or password");
   }
 });
 
+
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login'); // Redirecting to the login page
 });
+
+
 
 // POST endpoint for user registration
 app.post("/register", (req, res) => {
